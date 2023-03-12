@@ -4,9 +4,6 @@
 
 Esta é uma aplicação BackEnd para um sistema de delivery, EnaFood, onde o usuário poderá cadastrar sua conta e realizar pedidos de produtos cadastrados e manipula-los (inserir, aumentar/diminuir quantidade, remover, etc...).
 
-## 🔗Link de Acesso
-- Deploy Vercel: 
-
 ## 👥Equipe
 - DANIEL EMIDIO
 
