@@ -52,11 +52,17 @@ export class DeliveryController{
 
             await Delivery.create(newDelivery)
 
-            //Daniel: atualização da tabela Delivery_Product
-            const newDeliveryProduct = new DeliveryProduct({
+            //Daniel: incluindo pedido na tabela Delivery_Product
+
+            const deliveryProduct = {
                 product_id: filterProd._id,
                 delivery_id: newDelivery._id,
-                quantity,
+                total_quantity: quantity,
+                total_purchase: quantity * filterProd.price
+
+            }
+            const newDeliveryProduct = new DeliveryProduct({
+                ...deliveryProduct
             })
 
             await DeliveryProduct.create(newDeliveryProduct)    
@@ -146,7 +152,8 @@ export class DeliveryController{
             const newDeliveryProduct = new DeliveryProduct({
                 product_id: filterProd._id,
                 delivery_id: id,
-                quantity,
+                total_quantity: quantity,
+                total_purchase: quantity * filterProd.price
             })
 
             await DeliveryProduct.create(newDeliveryProduct)    
@@ -176,132 +183,200 @@ export class DeliveryController{
         }
     }
 
-    // //Daniel: listar todos os produtos
-    // public async getProductsById(req: Request, res: Response){
-    //     try {
-    //         const id = req.params.id as string
-
-    //         const filterProduct = await Product.findOne({_id: id})
+    //Daniel: atualizar produto no pedido
+    public async updateProdDelivery(req:Request,res:Response){
+        try {
                 
-    //         if(filterProduct === null){
-    //             res.status(400)
-    //             throw new Error("'id' não existe")
-    //         }
-
-    //         res.status(200).send(filterProduct)
-     
-    //     } catch (error) {
-    //         console.log(error)
-            
-     
-    //         if(res.statusCode === 200){
-    //             res.status(500)
-    //         }
-                         
-    //         if (error instanceof Error) {
-    //             res.send(error.message)
-    //             } else {
-    //                 res.send("Erro inesperado")
-    //             } 
-    //     }
-    // }
-
-    // //Daniel: atualizar produto
-    // public async updateProduct(req: Request, res: Response){
-    //     try {
-    //         const id = req.params.id as string | undefined
-    //         const newName = req.body.name as string | undefined
-    //         const newPrice = req.body.price as number | undefined
-    //         const newDescription = req.body.description as string | undefined
-    //         const newStock_product = req.body.stock_product as number | undefined
-    //         const filterProduct = await Product.findOne({_id: id})
-
-    //         if (newName !== undefined){
-    //             if (typeof newName !== "string"){
-    //                 res.status(400);
-    //                 throw new Error ("Valor inválido! 'Name' precisa ser String");
-    //             }
-    //         }
-
-    //         if (newPrice !== undefined){
-    //             if (typeof newPrice !== "number"){
-    //                 res.status(400);
-    //                 throw new Error ("Valor inválido! 'Price' precisa ser Number");
-    //             }
-    //         }
-
-    //         if (newDescription !== undefined){
-    //             if (typeof newDescription !== "string"){
-    //                 res.status(400);
-    //                 throw new Error ("Valor inválido! 'Description' precisa ser String");
-    //             }
-    //         }
-
-    //         if (newStock_product !== undefined){
-    //             if (typeof newStock_product !== "number"){
-    //                 res.status(400);
-    //                 throw new Error ("Valor inválido! 'Stock_Product' precisa ser 'Number'");
-    //             }
-    //         }
-
-    //         if(filterProduct){
-    //             const updateProduct = {
-    //                 name: newName || filterProduct.name,
-    //                 price: newPrice || filterProduct.price,
-    //                 description: newDescription || filterProduct.description,
-    //                 stock_product: newStock_product || filterProduct.stock_product,
-    //                 updated_at: (new Date()).toISOString()
-    //             }
-
-
-    //             await Product.updateOne({_id:id}, updateProduct)
-    //             res.status(200).send("Produto atualizado com sucesso")
-    //         }      
-     
-    //     } catch (error) {
-    //         console.log(error)
-            
-     
-    //         if(res.statusCode === 200){
-    //             res.status(500)
-    //         }
-                         
-    //         if (error instanceof Error) {
-    //             res.send(error.message)
-    //             } else {
-    //                 res.send("Erro inesperado")
-    //             } 
-    //     }
-    // }
-
-    //     //Daniel: excluir produto
-    //     public async deleteProductById(req: Request, res: Response){
-    //         try {
-    //             const id = req.params.id as string
+            const id = req.params.id
+            const {idprod, quantity} = req.body
+            let total_price_aux = 0
     
-    //             const filterProduct = await Product.findOne({_id: id})
+            if(!idprod){
+                res.status(422)
+                throw new Error("'idprod' é obrigatório!")
+            }
+    
+            if(!quantity){
+                res.status(422)
+                throw new Error("'quantity' é obrigatório!")
+            }
+    
+            const filterDelivery = await Delivery.findOne({_id: id}) //SERÁ ADICIONADO CONDICIONAL CASO PEDIDO NÃO SEJA ACHADO
+       
+            const filterProd = await Product.findOne({_id:idprod})
+
+            const findProdInDelivery = await DeliveryProduct.findOne({delivery_id: id, product_id: idprod})
+    
+            //Daniel: atualização do estoque do produto na tabela
+            const updateProduct = {
+                    stock_product: quantity > findProdInDelivery.total_quantity ? filterProd.stock_product + (quantity - findProdInDelivery.total_quantity) : filterProd.stock_product + (findProdInDelivery.total_quantity - quantity),
+                    updated_at: (new Date()).toISOString()
+                }
+    
+            await Product.updateOne({_id:idprod}, updateProduct)   
+
+            //Daniel: atualização da tabela Delivery_Product
+            const updateDeliveryProduct = {
+                product_id: filterProd._id,
+                delivery_id: id,
+                total_quantity: quantity,
+                total_purchase: quantity * filterProd.price
+            }
+
+            await DeliveryProduct.updateOne({delivery_id: id, product_id: idprod}, updateDeliveryProduct)
+             
+            const filterDeliveryProd = await DeliveryProduct.find({delivery_id: id})
+            
+            //Daniel: laço utilizado para atualizar o valor do pedido após a atualização da tabela 'delivery_product'
+            for(let i=0; i<filterDeliveryProd.length;i++){
+                total_price_aux += filterDeliveryProd[i].total_purchase
+            }
+            
+            //Daniel: atualização da tabela Delivery
+            const updateDelivery = {             
+                total_price: total_price_aux
+            }
+    
+            await Delivery.updateOne({_id: id},updateDelivery)
+    
+            res.status(201).send("Pedido atualizado com sucesso!");
+    
+        } catch (error) {
+            console.log(error)
+    
+            if(res.statusCode === 200){
+                res.status(500)
+            }
+                        
+            if (error instanceof Error) {
+                res.send(error.message)
+            } else {
+                res.send("Erro inesperado")
+            }  
+        }
+    }
+
+    //Daniel: finalizar pedido
+    public async finishDelivery(req:Request,res:Response){
+        try {
+            const id = req.params.id
+            const {delivery_address_street, 
+                delivery_address_street_number, 
+                delivery_address_cep, 
+                delivery_address_complement,
+                form_payment } = req.body
+            const filterDelivery = await Delivery.findOne({_id:id})
+    
+            const filterUser = await User.findOne({_id:filterDelivery.user_id})         
+
+            const finishDelivery = {
+                paid: true,        
+                delivery_address_street: filterUser.address_cep === delivery_address_cep ? filterUser.address_street : delivery_address_street,
+                delivery_address_street_number: filterUser.address_cep === delivery_address_cep ? filterUser.address_street_number : delivery_address_street_number,
+                delivery_address_cep: filterUser.address_cep === delivery_address_cep ? filterUser.address_cep : delivery_address_cep,
+                delivery_address_complement: filterUser.address_cep === delivery_address_cep ? filterUser.address_complement : delivery_address_complement,
+                form_payment: form_payment,
+            }
+
+            await Delivery.updateOne({_id: id}, finishDelivery)   
+
+            res.status(201).send({ message: "Pedido finalizado com sucesso!"});
+
+        } catch (error) {
+            console.log(error)
+
+            if(res.statusCode === 200){
+                res.status(500)
+            }
                     
-    //             if(filterProduct === null){
-    //                 res.status(400)
-    //                 throw new Error("'id' não existe")
-    //             }
-                
-    //             await Product.deleteOne({_id:id})
-    //             res.status(200).send('Produto excluido com sucesso!')
-         
-    //         } catch (error) {
-    //             console.log(error)
-                
-         
-    //             if(res.statusCode === 200){
-    //                 res.status(500)
-    //             }
-                             
-    //             if (error instanceof Error) {
-    //                 res.send(error.message)
-    //                 } else {
-    //                     res.send("Erro inesperado")
-    //                 } 
-    //         }
-    //     }
+            if (error instanceof Error) {
+                res.send(error.message)
+            } else {
+                res.send("Erro inesperado")
+            }  
+        }
+    }
+
+    //Daniel: excluir pedido
+    public async deleteDelivery(req:Request,res:Response){
+        try {
+
+            const id = req.params.id
+
+            await DeliveryProduct.deleteMany({delivery_id: id})
+            await Delivery.deleteOne({_id:id})
+
+            res.status(201).send("Pedido gerado com sucesso!");
+
+        } catch (error) {
+            console.log(error)
+
+            if(res.statusCode === 200){
+                res.status(500)
+            }
+                    
+            if (error instanceof Error) {
+                res.send(error.message)
+            } else {
+                res.send("Erro inesperado")
+            }  
+        }
+    }
+
+    //Daniel: excluir produto do pedido
+    public async deleteProdDelivery(req:Request,res:Response){
+        try {
+
+            const {id, idprod} = req.params
+
+            let total_price_aux = 0
+    
+            const filterDelivery = await Delivery.findOne({_id: id}) //SERÁ ADICIONADO CONDICIONAL CASO PEDIDO NÃO SEJA ACHADO
+       
+            const filterProd = await Product.findOne({_id:idprod})
+
+            const findProdInDelivery = await DeliveryProduct.findOne({delivery_id: id, product_id: idprod})
+    
+            //Daniel: atualização do estoque do produto na tabela
+            const updateProduct = {
+                    stock_product: filterProd.stock_product + findProdInDelivery.total_quantity,
+                    updated_at: (new Date()).toISOString()
+                }
+            
+            await DeliveryProduct.deleteOne({product_id: idprod})
+
+            await Product.updateOne({_id:idprod}, updateProduct)   
+             
+            const filterDeliveryProd = await DeliveryProduct.find({delivery_id: id})
+            
+            //Daniel: laço utilizado para atualizar o valor do pedido após a atualização da tabela 'delivery_product'
+            for(let i=0; i<filterDeliveryProd.length;i++){
+                total_price_aux += filterDeliveryProd[i].total_purchase
+            }
+            
+            //Daniel: atualização da tabela Delivery
+            const updateDelivery = {             
+                total_price: total_price_aux
+            }
+    
+            await Delivery.updateOne({_id: id},updateDelivery)
+    
+            res.status(201).send("Produto excluido com sucesso!");
+
+        } catch (error) {
+            console.log(error)
+
+            if(res.statusCode === 200){
+                res.status(500)
+            }
+                    
+            if (error instanceof Error) {
+                res.send(error.message)
+            } else {
+                res.send("Erro inesperado")
+            }  
+        }
+    }
+
+
 }

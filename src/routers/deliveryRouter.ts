@@ -23,16 +23,13 @@ deliveryRouter.post("/", deliveryController.insertNewDelivery)
 deliveryRouter.post("/:id", deliveryController.insertNewProdDelivery)
 
 //Daniel: endpoint para atualização de pedido de delivery
-deliveryRouter.put("/:id")
+deliveryRouter.put("/:id/", deliveryController.updateProdDelivery)
 
 //Daniel: endpoint para finalização do pedido de delivery
-deliveryRouter.put("/:id/finish")
-
-//Daniel: endpoint para atualização de um produto do pedido de delivery
-deliveryRouter.put("/:id/:idprod")
+deliveryRouter.put("/:id/finish", deliveryController.finishDelivery)
 
 //Daniel: endpoint para excluir pedido de delivery
-deliveryRouter.delete("/:id")
+deliveryRouter.delete("/:id", deliveryController.finishDelivery)
 
 //Daniel: endpoint para excluir um produto do pedido de delivery
-deliveryRouter.delete("/:id/:idprod")
+deliveryRouter.delete("/:id/:idprod", deliveryController.deleteProdDelivery)
