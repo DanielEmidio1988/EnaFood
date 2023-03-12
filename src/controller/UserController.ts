@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/User';
+import { Delivery } from '../models/Delivery';
 import { ROLE_USER } from '../types';
 import { TokenPayload } from '../types';
 import { HashManager } from '../services/HashManager';
@@ -98,116 +99,43 @@ export class UserController{
         }
       };
 
-    //   async login(req: Request, res: Response){
-    //     try {
-    
-    //     const email = req.body.email;
-    //     const password = req.body.password;
+            //Daniel: buscar todos os usuários
+      public getUserbyId = async (req: Request, res: Response) => {
+        try {
+            const id = req.params.id
 
-    //     // const token = await UserBusiness.login(email, password);
+            const filterusers = await User.findOne({_id:id});
+            const filterDeliverys = await Delivery.find({user_id: id})
 
-    //     res.send({ message: "Login successful", token });
-            
-    //     } catch (error) {
-    //         console.log(error)
+            const user = {
+                _id: filterusers.id,
+                username: filterusers.username,
+                email: filterusers.email,
+                role: filterusers.role,
+                phone: filterusers.phone,
+                created_at: filterusers.created_at,
+                address_street: filterusers.address_street,
+                address_street_number: filterusers.address_street_number,
+                address_cep: filterusers.address_cep,
+                address_complement: filterusers.address_complement,
+                address_uf: filterusers.address_uf,
+                city: filterusers.city,
+                deliverys: filterDeliverys
+            }
 
-    //         if(res.statusCode === 200){
-    //             res.status(500)
-    //         }
+            res.status(200).send(user);
+        } catch (error) {
+            console.log(error)
+
+            if(res.statusCode === 200){
+                res.status(500)
+            }
                     
-    //         if (error instanceof Error) {
-    //             res.send(error.message)
-    //         } else {
-    //             res.send("Erro inesperado")
-    //         } 
-    //     }
-    //   }
+            if (error instanceof Error) {
+                res.send(error.message)
+            } else {
+                res.send("Erro inesperado")
+            } 
+        }
+      };
 }
-
-    
-
-
-
-//============================================
-// export class UserController{
-//     constructor()
-//     {}
-
-//     //Daniel: cadastro novo usuário
-//     public signUp = async (req: Request, res: Response) => {
-//         try {
-//         //   const { name, email, password } = req.body;
-//         const user:User = {
-//             name: req.body.name
-//         }
-
-
-//           const user = await User.create({ name, email, password });
-//           res.status(201).json(user);
-//         } catch (error) {
-//             console.log(error)
-
-//             if(res.statusCode === 200){
-//                 res.status(500)
-//             }
-                    
-//             if (error instanceof Error) {
-//                 res.send(error.message)
-//             } else {
-//                 res.send("Erro inesperado")
-//             } 
-//         }
-//       };
-      
-//       //buscar todos os usuários
-//       public getAllUsers = async (req: Request, res: Response) => {
-//         try {
-//           const filterusers = await User.find();
-//           res.status(200).send(filterusers);
-//         } catch (error) {
-//             console.log(error)
-
-//             if(res.statusCode === 200){
-//                 res.status(500)
-//             }
-                    
-//             if (error instanceof Error) {
-//                 res.send(error.message)
-//             } else {
-//                 res.send("Erro inesperado")
-//             } 
-//         }
-//       };
-
-//       public login = async(req: Request, res: Response)=>{
-//         try {
-
-//             const {email, password} = req.body
-
-//             const filteruser = await User.findOne(email)
-
-//             if(!filteruser){
-//                 res.status(400)
-//                 throw new Error("'E-mail' não localizado")
-//             }
-
-//             if(filteruser.email !== email && filteruser.password !== password){
-//                 res.status(400)
-//                 throw new Error("'E-mail' ou 'Password' incorreto!")
-//             }
-            
-//         } catch (error) {
-//             console.log(error)
-
-//             if(res.statusCode === 200){
-//                 res.status(500)
-//             }
-                    
-//             if (error instanceof Error) {
-//                 res.send(error.message)
-//             } else {
-//                 res.send("Erro inesperado")
-//             } 
-//         }
-//       }
-// }
