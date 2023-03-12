@@ -1,8 +1,10 @@
+//Daniel: enum para o perfil de usuário
 export enum ROLE_USER{
     ADMIN = 'ADMIN',
     NORMAL = 'NORMAL'
 }
 
+//Daniel: enum para os estados do território nacional
 export enum UF{
     AC = 'AC',
     AL = 'AL',
@@ -33,28 +35,13 @@ export enum UF{
     TO = 'TO',
 }
 
+//Daniel: enum para os tipos de pagamento
 export enum FORM_PAYMENT{
     AVISTA = 'A Vista',
     DEBITO = 'Débito',
     CREDITO = 'Crédito',
     VA = 'Vale Alimentação',
     VR = 'Vale Refeição'
-}
-
-export interface PurchaseDB{
-    id:string
-    user_id: string
-    total_price: number
-    paid:number    
-    form_payment: FORM_PAYMENT
-    created_at: string
-    delivered_at: string
-}
-
-export interface PurchasesProductsDB{
-    purchase_id: string, 
-    product_id: string,
-    quantity:number,
 }
 
 //Daniel: interface para dados de Token

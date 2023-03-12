@@ -15,3 +15,6 @@ userRouter.get("/",userController.getAllUsers)
 
 //Daniel: endpoint para cadastrar um novo cliente
 userRouter.post("/signup", userController.signUp)
+
+//Daniel: endpoint para verificar o histórico de compra do cliente
+userRouter.get("/users/:id/purchases")

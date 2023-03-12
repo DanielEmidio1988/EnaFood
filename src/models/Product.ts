@@ -15,7 +15,7 @@ const ProductSchema = new Schema({
     price: {type:Number, require:true, unique: true},
     description: {type:String, require:true},
     image_url: {type:String},
-    stock_product: {type: String, default: 0},
+    stock_product: {type: Number, default: 0},
     created_at: {type:Date, default:(new Date()).toISOString()},
     updated_at: {type:Date, default:(new Date()).toISOString()},
 
