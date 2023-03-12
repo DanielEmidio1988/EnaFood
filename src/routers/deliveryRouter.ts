@@ -14,7 +14,7 @@ const deliveryController = new DeliveryController(
 deliveryRouter.get("/", deliveryController.getAllDeliverys)
 
 //Daniel: endpoint para resgatar pedido de delivery individual
-deliveryRouter.get("/:id")
+deliveryRouter.get("/:id", deliveryController.getDeliverybyId)
 
 //Daniel: endpoint para cadastrar um novo pedido de delivery
 deliveryRouter.post("/", deliveryController.insertNewDelivery)

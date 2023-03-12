@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Product } from '../models/Product';
+import { DeliveryProduct } from '../models/DeliveryProducts';
 import { TokenPayload } from '../types';
 import { HashManager } from '../services/HashManager';
 import { TokenManager } from '../services/TokenManager';
@@ -88,13 +89,28 @@ export class ProductController{
             const id = req.params.id as string
 
             const filterProduct = await Product.findOne({_id: id})
+            const filterDelivery = await DeliveryProduct.find({product_id:id})
+            
                 
             if(filterProduct === null){
                 res.status(400)
                 throw new Error("'id' não existe")
             }
 
-            res.status(200).send(filterProduct)
+            const product = {
+                _id: filterProduct._id,
+                name: filterProduct.name,
+                price: filterProduct.price,
+                description: filterProduct.description,
+                image_url: filterProduct.image_url,
+                stock_product: filterProduct.stock_product,
+                delivery_historic: filterDelivery.map((delivery)=>{ 
+                    return {
+                        delivery_id: delivery.delivery_id,
+                        quantity: delivery.total_quantity}})
+            }
+
+            res.status(200).send(product)
      
         } catch (error) {
             console.log(error)
@@ -148,6 +164,11 @@ export class ProductController{
                     res.status(400);
                     throw new Error ("Valor inválido! 'Stock_Product' precisa ser 'Number'");
                 }
+            }
+
+            if(newStock_product < 0){
+                res.status(400);
+                throw new Error ("Valor inválido! 'Stock_Product' não pode ser negativo")
             }
 
             if(filterProduct){
