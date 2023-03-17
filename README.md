@@ -148,6 +148,7 @@ Response:
 ```
 
 --Product
+
 **-Get Products:** Retorna todos os produtos:
 ```bash
 location: http://localhost:3003/products
@@ -274,6 +275,7 @@ Response:
 
 
 --Delivery
+
 **-Get Deliverys:** Retorna todos os pedidos cadastrados
 ```bash
 location: http://localhost:3003/delivery/
@@ -446,7 +448,7 @@ Response:
 }
 ```
 
-- Delete Prod Delivery: Excluir produto do pedido
+**-Delete Prod Delivery:** Excluir produto do pedido
 ```bash
 location: http://localhost:3003/delivery/:id/:idprod
 
@@ -461,7 +463,7 @@ Response:
 }
 ```
 
-- Delete Delivery: Exclui pedido
+**-Delete Delivery:** Exclui pedido
 ```bash
 location: http://localhost:3003/delivery/:id
 
@@ -478,7 +480,8 @@ Response:
 
 
 --Phase
--Get Phase: Analisa fase atual do projeto;
+
+**-Get Phase:** Analisa fase atual do projeto;
 ```bash
 location: http://localhost:3003/phase/
 
@@ -503,11 +506,20 @@ Response:
 Para análise da fase do projeto, foi elaborado o endpoint `Get Phase`, que retorna o status atual do projeto, considerando o seguinte cenário:
 
 **-Fase 1 - MVP:** Nesta fase o dFood possui apenas poucos usuários (por volta de 100) e cada usuário pede, em média, 5 vezes por mês. Cada pedido possui de 1 a 5 produtos.
+
 **-Fase 2 – early adopters:** Nesta fase o dFood possui mais usuários (por volta de 10.000) e cada usuário compra, em média, 10 vezes ao mês. Cada compra possui de 1 a 15 produtos.
-**-Fase 3 – early majority:** Nesta fase o dFood possui ainda mais usuários (por volta de
-1.000.000) e cada usuário compra, em média, 25 vezes ao mês. Cada compra possui de 1 a 20
-produtos.
+
+**-Fase 3 – early majority:** Nesta fase o dFood possui ainda mais usuários (por volta de 1.000.000) e cada usuário compra, em média, 25 vezes ao mês. Cada compra possui de 1 a 20 produtos.
+
 **-Fase 4 – late majority:** Nesta fase o dFood é um sucesso e é a principal rede de delivery Brasil (por volta de 50.000.000 de usuários) e cada usuário publica, em média, 30 vezes ao mês. Cada compra possui de 1 a 20 produtos.
+
+
+## 💻Tecnologias 
+
+![NodeJs](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Git](https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white)
 
 ### Bibliotecas utilizadas
 ```bash
@@ -520,13 +532,6 @@ produtos.
 ## 💡Programas utilizados:
 - Postman API Platform
 - VSCode
-
-## 💻Tecnologias 
-
-![NodeJs](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
-![Git](https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white)
 
 ## 📫 Contato
 
